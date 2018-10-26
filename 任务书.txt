@@ -1,77 +1,79 @@
-�̵깦�ܿ���
+商店功能开发
 
-ϸ�������ӿ�
-1���̵��ѯ
-2���̵깺��
-3���̵��ֶ�ˢ��
+细分三个接口
+1、商店查询
+2、商店购买
+3、商店手动刷新
 
-������
-1�����ñ���
-	blackmarket_pos  �̵�λ�ò�������
-		pos ��ʾ 1-6 6��λ�ã� 
-		items1���ã�
-		items2 ��ʾÿ��λ�ÿ��������Ʒ�������Ȩ��  ��ʽ ����Ʒid��Ȩ��;
-			��Ʒid�� ���ñ� blackmarket_items �е� id�ֶζ�Ӧ
+描述：
+1、配置表：
+	blackmarket_pos  商店位置参数表，
+		pos 表示 1-6 6个位置， 
+		items1无用，
+		items2 表示每个位置可随出的商品及随出的权重  格式 ：商品id，权重;
+			商品id与 配置表 blackmarket_items 中的 id字段对应
 
-	blackmarket_items �̵���Ʒ��
-		id ��ʾ��Ʒid
-		consume ��ʾ ������Ʒid,����;
-		good  ��ʾ ��ù�������Ʒid,������
-		limit ��ʾ��Ʒ�����ƵĹ������
-		recommend ����
-		vip ��ʾ���vip�ȼ����ƣ��ﵽvip���Ƶȼ����ϲ���ˢ����
-		team  ��ʾ��ҵȼ����ƣ��ﵽ�ȼ����Ƶ���Ҳ���ˢ����
+	blackmarket_items 商店商品表
+		id 表示商品id
+		consume 表示 消耗物品id,数量;
+		good  表示 获得购买获得物品id,数量；
+		limit 表示物品被限制的购买次数
+		recommend 无用
+		vip 表示玩家vip等级限制，达到vip限制等级以上才能刷出来
+		team  表示玩家等级限制，达到等级限制的玩家才能刷出来
 
-���ݱ�
-	t_role  �����Ϣ��
-		id  ���rid
-		name �������
-		vip ���vip�ȼ�
-		level ��Ҷ���ȼ�
+数据表
+	t_role  玩家信息表
+		id  玩家rid
+		name 玩家名称
+		vip 玩家vip等级
+		level 玩家队伍等级
 
-	t_props  ��ҵ�����Ϣ��
-		rid ���rid
-		cid ��ҵ���id
-		num ��ҵ�������
+	t_props  玩家道具信息表
+		rid 玩家rid
+		cid 玩家道具id
+		num 玩家道具数量
 
-Ҫ��
-	1���Խ����ݱ�  t_blackmarket
-		�����ֶ�  rid�����id
-				 s1, λ��1��Ʒid
-				 n1, λ��1��Ʒ�һ�����
-				 s2, λ��2��Ʒid
-				 n2, λ��2��Ʒ�һ�����
-				 s3, λ��3��Ʒid
-				 n3, λ��3��Ʒ�һ�����
-				 s4, λ��4��Ʒid
-				 n4, λ��4��Ʒ�һ�����
-				 s5, λ��5��Ʒid
-				 n5, λ��5��Ʒ�һ�����
-				 s6, λ��6��Ʒid
-				 n6, λ��6��Ʒ�һ�����
+要求
+	1、自建数据表  t_blackmarket
+		包含字段  rid，玩家id
+				 s1, 位置1商品id
+				 n1, 位置1商品兑换次数
+				 s2, 位置2商品id
+				 n2, 位置2商品兑换次数
+				 s3, 位置3商品id
+				 n3, 位置3商品兑换次数
+				 s4, 位置4商品id
+				 n4, 位置4商品兑换次数
+				 s5, 位置5商品id
+				 n5, 位置5商品兑换次数
+				 s6, 位置6商品id
+				 n6, 位置6商品兑换次数
 
-	2���̵��ѯ 
-		��һ�β�ѯʱ���� t_blackmarket û����ҵ����ݣ��贴���������
-		ɸѡ�����߼�
-			1��ÿ��λ�ø��� blackmarket_pos �����õ�Ȩ�أ����һ����Ʒid�����������Ʒ ��ҵ� vip�ȼ��� team�ȼ����Ʋ���꣬������ɸѡ���ݣ�ֱ��ɸѡ�����ʵ����ݣ�����䵽 t_blackmarket ��Ӧ��λ����
+	2、商店查询 
+		第一次查询时，若 t_blackmarket 没有玩家的数据，需创建玩家数据
+		筛选数据逻辑
+			1、每个位置根据 blackmarket_pos 表配置的权重，随出一个商品id，若随出的商品 玩家的 vip等级或 team等级限制不达标，则重新筛选数据，直到筛选出合适的数据，并填充到 t_blackmarket 对应的位置上
 
-		��ѯʱ ���� ��� �̵� ÿ��λ����Ʒ��id�����һ�����
+		查询时 返回 玩家 商店 每个位置商品的id，及兑换次数
 
-	3����Ʒ�һ�
-		���� ��� t_props ���ж�Ӧ�ĵ��ߣ������  blackmarket_items���ñ������õ� good���� ���ӵ� t_props���ñ���
-		���� �һ��Ƿ�ɹ��������ɹ�����ԭ�����ɹ� ���ضһ���õ���Ʒ, ��ĳ��λ���ϵĶһ���Ʒ�����ﵽ���޺�������ˢ����һλ�õ���Ʒ
+	3、商品兑换
+		消耗 玩家 t_props 表中对应的道具，并获得  blackmarket_items配置表中配置的 good，并 添加到 t_props配置表中
+		返回 兑换是否成功，若不成功返回原因，若成功 返回兑换获得的物品, 当某个位置上的兑换物品次数达到上限后，需重新刷新这一位置的商品
 
-	4���̵��ֶ�ˢ��
-		ˢ���߼�
-			1��ÿ��λ�ø��� blackmarket_pos �����õ�Ȩ�أ����һ����Ʒid�����������Ʒ ��ҵ� vip�ȼ��� team�ȼ����Ʋ���꣬������ɸѡ���ݣ�ֱ��ɸѡ�����ʵ����ݣ�����䵽 t_blackmarket ��Ӧ��λ����
+	4、商店手动刷新
+		刷新逻辑
+			1、每个位置根据 blackmarket_pos 表配置的权重，随出一个商品id，若随出的商品 玩家的 vip等级或 team等级限制不达标，则重新筛选数据，直到筛选出合适的数据，并填充到 t_blackmarket 对应的位置上
 
-		����ˢ�º��ÿ��λ���ϵ���Ʒid���һ�����
+		返回刷新后的每个位置上的商品id及兑换次数
 
 
-1��http��������ʱ������Ҫ������ҵ� rid
+1、http请求，请求时参数中要包含玩家的 rid
 	api
-		�̵��ѯ  shopquery
-		��Ʒ�һ�  shopexchange
-		�̵��ֶ�ˢ��  shoprefresh
+		商店查询  shopquery
+		商品兑换  shopexchange
+		商店手动刷新  shoprefresh
 
-2��������json��ʽ���������id
+2、返回用json格式，包含玩家id
+
+test111111
